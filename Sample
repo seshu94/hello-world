@@ -2,6 +2,6 @@ public class Sample{
   public static void doSample(){
     System.debug('Hi');
     System.debug('Edited from VS Code');
-    System.debug('Edited from VS Code');
+    System.debug('Edited from VS');
   }
 }
