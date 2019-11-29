@@ -10,6 +10,8 @@ public class Sample{
     System.debug('Sale Edited THis');
     System.debug('Sale Edited THis');
     System.debug('Sale Edited THis');
+    System.debug('Sale Edited THis');
+    System.debug('Sale Edited THis');
     System.debug('Edited from VS');
   }
 }
