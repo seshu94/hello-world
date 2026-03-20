@@ -1,0 +1,40 @@
+<template>
+    <lightning-card title="Account Details" icon-name="standard:account">
+        <template if:true={account}>
+            <div class="slds-p-horizontal_medium slds-p-vertical_small">
+                <dl class="slds-list_horizontal slds-wrap">
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Account Name">
+                        Account Name:
+                    </dt>
+                    <dd class="slds-item_detail slds-truncate" title={name}>{name}</dd>
+
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Account Number">
+                        Account Number:
+                    </dt>
+                    <dd class="slds-item_detail slds-truncate" title={accountNumber}>{accountNumber}</dd>
+
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Phone">
+                        Phone:
+                    </dt>
+                    <dd class="slds-item_detail slds-truncate" title={phone}>{phone}</dd>
+
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Website">
+                        Website:
+                    </dt>
+                    <dd class="slds-item_detail slds-truncate" title={website}>{website}</dd>
+
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Industry">
+                        Industry:
+                    </dt>
+                    <dd class="slds-item_detail slds-truncate" title={industry}>{industry}</dd>
+                </dl>
+            </div>
+        </template>
+
+        <template if:true={error}>
+            <div class="slds-p-around_medium slds-text-color_error">
+                Unable to load account details.
+            </div>
+        </template>
+    </lightning-card>
+</template>

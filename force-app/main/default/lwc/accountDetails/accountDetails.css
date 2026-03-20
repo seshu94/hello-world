@@ -1,0 +1,5 @@
+.slds-item_label,
+.slds-item_detail {
+    width: 50%;
+    margin-bottom: 0.75rem;
+}
