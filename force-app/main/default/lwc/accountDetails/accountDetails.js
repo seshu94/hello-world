@@ -1,47 +1,140 @@
-import { LightningElement, api, wire } from 'lwc';
-import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
+import { LightningElement } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { gql, executeMutation } from 'lightning/graphql';
 
-import NAME_FIELD from '@salesforce/schema/Account.Name';
-import ACCOUNT_NUMBER_FIELD from '@salesforce/schema/Account.AccountNumber';
-import PHONE_FIELD from '@salesforce/schema/Account.Phone';
-import WEBSITE_FIELD from '@salesforce/schema/Account.Website';
-import INDUSTRY_FIELD from '@salesforce/schema/Account.Industry';
+const CREATE_ACCOUNT_MUTATION = gql`
+    mutation CreateAccount($input: AccountCreateInput!) {
+        uiapi {
+            AccountCreate(input: $input) {
+                Record {
+                    Id
+                    Name {
+                        value
+                    }
+                    AccountNumber {
+                        value
+                    }
+                    Phone {
+                        value
+                    }
+                    Website {
+                        value
+                    }
+                    Industry {
+                        value
+                    }
+                }
+            }
+        }
+    }
+`;
 
-const FIELDS = [
-    NAME_FIELD,
-    ACCOUNT_NUMBER_FIELD,
-    PHONE_FIELD,
-    WEBSITE_FIELD,
-    INDUSTRY_FIELD
-];
+const EMPTY_FORM = {
+    Name: '',
+    AccountNumber: '',
+    Phone: '',
+    Website: '',
+    Industry: ''
+};
 
 export default class AccountDetails extends LightningElement {
-    @api recordId;
+    formData = { ...EMPTY_FORM };
+    createdAccount;
+    errorMessage = '';
+    isSaving = false;
 
-    @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
-    account;
-
-    get name() {
-        return getFieldValue(this.account.data, NAME_FIELD) || 'Not available';
+    handleChange(event) {
+        const { name, value } = event.target;
+        this.formData = {
+            ...this.formData,
+            [name]: value
+        };
     }
 
-    get accountNumber() {
-        return getFieldValue(this.account.data, ACCOUNT_NUMBER_FIELD) || 'Not available';
+    async handleSubmit() {
+        if (!this.validateInputs()) {
+            return;
+        }
+
+        this.isSaving = true;
+        this.errorMessage = '';
+        this.createdAccount = undefined;
+
+        try {
+            const { data, errors } = await executeMutation({
+                query: CREATE_ACCOUNT_MUTATION,
+                variables: {
+                    input: this.buildInput()
+                },
+                operationName: 'CreateAccount'
+            });
+
+            if (errors?.length) {
+                throw new Error(this.reduceErrors(errors));
+            }
+
+            const record = data?.uiapi?.AccountCreate?.Record;
+
+            this.createdAccount = {
+                id: record?.Id || '',
+                name: record?.Name?.value || 'Not available',
+                accountNumber: record?.AccountNumber?.value || 'Not available',
+                phone: record?.Phone?.value || 'Not available',
+                website: record?.Website?.value || 'Not available',
+                industry: record?.Industry?.value || 'Not available'
+            };
+
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: 'Account created successfully.',
+                    variant: 'success'
+                })
+            );
+
+            this.formData = { ...EMPTY_FORM };
+        } catch (error) {
+            this.errorMessage = error.message || 'Unable to create the account.';
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Error creating account',
+                    message: this.errorMessage,
+                    variant: 'error'
+                })
+            );
+        } finally {
+            this.isSaving = false;
+        }
     }
 
-    get phone() {
-        return getFieldValue(this.account.data, PHONE_FIELD) || 'Not available';
+    handleReset() {
+        this.formData = { ...EMPTY_FORM };
+        this.errorMessage = '';
     }
 
-    get website() {
-        return getFieldValue(this.account.data, WEBSITE_FIELD) || 'Not available';
+    validateInputs() {
+        const inputs = [...this.template.querySelectorAll('lightning-input')];
+        return inputs.reduce((isValid, input) => {
+            input.reportValidity();
+            return isValid && input.checkValidity();
+        }, true);
     }
 
-    get industry() {
-        return getFieldValue(this.account.data, INDUSTRY_FIELD) || 'Not available';
+    buildInput() {
+        const accountFields = Object.entries(this.formData).reduce((input, [fieldName, value]) => {
+            if (value) {
+                input[fieldName] = value;
+            }
+
+            return input;
+        }, {});
+
+        return {
+            Account: accountFields
+        };
     }
 
-    get error() {
-        return this.account.error;
+    reduceErrors(errors) {
+        return errors.map((item) => item.message).join(', ');
     }
 }

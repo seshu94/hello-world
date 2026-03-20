@@ -1,5 +1,8 @@
-.slds-item_label,
-.slds-item_detail {
-    width: 50%;
+.field {
+    display: block;
     margin-bottom: 0.75rem;
+}
+
+.result-panel {
+    border-top: 1px solid #dddbda;
 }

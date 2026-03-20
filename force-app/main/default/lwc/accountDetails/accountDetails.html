@@ -1,39 +1,79 @@
 <template>
-    <lightning-card title="Account Details" icon-name="standard:account">
-        <template if:true={account}>
-            <div class="slds-p-horizontal_medium slds-p-vertical_small">
-                <dl class="slds-list_horizontal slds-wrap">
-                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Account Name">
-                        Account Name:
-                    </dt>
-                    <dd class="slds-item_detail slds-truncate" title={name}>{name}</dd>
+    <lightning-card title="Create Account" icon-name="standard:account">
+        <div class="slds-p-around_medium">
+            <lightning-input
+                class="field"
+                label="Account Name"
+                name="Name"
+                value={formData.Name}
+                onchange={handleChange}
+                required
+            ></lightning-input>
 
-                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Account Number">
-                        Account Number:
-                    </dt>
-                    <dd class="slds-item_detail slds-truncate" title={accountNumber}>{accountNumber}</dd>
+            <lightning-input
+                class="field"
+                label="Account Number"
+                name="AccountNumber"
+                value={formData.AccountNumber}
+                onchange={handleChange}
+            ></lightning-input>
 
-                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Phone">
-                        Phone:
-                    </dt>
-                    <dd class="slds-item_detail slds-truncate" title={phone}>{phone}</dd>
+            <lightning-input
+                class="field"
+                type="tel"
+                label="Phone"
+                name="Phone"
+                value={formData.Phone}
+                onchange={handleChange}
+            ></lightning-input>
 
-                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Website">
-                        Website:
-                    </dt>
-                    <dd class="slds-item_detail slds-truncate" title={website}>{website}</dd>
+            <lightning-input
+                class="field"
+                type="url"
+                label="Website"
+                name="Website"
+                value={formData.Website}
+                onchange={handleChange}
+            ></lightning-input>
 
-                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Industry">
-                        Industry:
-                    </dt>
-                    <dd class="slds-item_detail slds-truncate" title={industry}>{industry}</dd>
-                </dl>
+            <lightning-input
+                class="field"
+                label="Industry"
+                name="Industry"
+                value={formData.Industry}
+                onchange={handleChange}
+            ></lightning-input>
+
+            <template if:true={errorMessage}>
+                <div class="slds-text-color_error slds-m-bottom_medium">
+                    {errorMessage}
+                </div>
+            </template>
+
+            <div class="slds-m-top_medium">
+                <lightning-button
+                    label="Cancel"
+                    onclick={handleReset}
+                    class="slds-m-right_small"
+                ></lightning-button>
+                <lightning-button
+                    variant="brand"
+                    label="Create Account"
+                    onclick={handleSubmit}
+                    disabled={isSaving}
+                ></lightning-button>
             </div>
-        </template>
+        </div>
 
-        <template if:true={error}>
-            <div class="slds-p-around_medium slds-text-color_error">
-                Unable to load account details.
+        <template if:true={createdAccount}>
+            <div class="result-panel slds-p-horizontal_medium slds-p-bottom_medium">
+                <p class="slds-text-title_bold slds-m-bottom_small">Created Account</p>
+                <p>Name: {createdAccount.name}</p>
+                <p>Account Number: {createdAccount.accountNumber}</p>
+                <p>Phone: {createdAccount.phone}</p>
+                <p>Website: {createdAccount.website}</p>
+                <p>Industry: {createdAccount.industry}</p>
+                <p>Record Id: {createdAccount.id}</p>
             </div>
         </template>
     </lightning-card>
